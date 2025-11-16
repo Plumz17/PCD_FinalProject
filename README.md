@@ -40,19 +40,11 @@ Lung region isolation using:
 - **Morphological Operations**: Opening and closing to refine masks
 - **Connected Component Analysis**: Selection of largest lung regions
 
-### 4. Feature Extraction
+### 4. Feature Extraction and Representation
 Multiple feature types for comprehensive analysis:
-- **Canny Edge Detection**: Lung boundaries and cavity contours
-- **Harris Corner Detection**: Inflammation points and structural changes
-- **Hough Transform**: Line detection for fibrosis patterns
-
-### 5. Feature Representation
-- **Polygonal Approximation**: Boundary simplification and noise reduction
-- **Signatures**: 1D functional representation of boundaries
-
-### 6. Feature Matching
-- **SIFT (Scale-Invariant Feature Transform)**: Scale and rotation invariant matching
-- **Similarity Metrics**: Euclidean distance and cross-correlation
+- **LBP Features**
+- **GLCM Features**
+- **HOG Features**
 
 ## 🚀 Installation & Usage
 
@@ -115,23 +107,6 @@ kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (13, 13))
 img_opened = cv2.morphologyEx(img_seg, cv2.MORPH_OPEN, kernel)
 ```
 
-## 📊 Preliminary Results
-
-| Feature Type | Accuracy | Precision | Recall | F1-Score |
-|--------------|----------|-----------|--------|----------|
-| Edge Features Only | 76% | 74% | 77% | 75% |
-| Corner Features Only | 72% | 70% | 73% | 71% |
-| Line Features Only | 69% | 67% | 70% | 68% |
-| **Combined Features** | **82%** | **80%** | **83%** | **81%** |
-
-## 🎯 Clinical Relevance
-
-The extracted features correspond to actual clinical manifestations of TB:
-- **White spots** → Inflammation areas (Harris corners)
-- **Cavity boundaries** → Lung tissue damage (Canny edges)
-- **Fibrosis lines** → Scar tissue formation (Hough lines)
-- **Asymmetrical shapes** → Volume loss in affected lungs
-
 ## 🚀 Future Work
 
 - Expand evaluation with comprehensive experiments
@@ -143,8 +118,10 @@ The extracted features correspond to actual clinical manifestations of TB:
 ## 👥 Contributors
 
 **Group 5 - Digital Image Processing Course**
-- Department of Computer Science and Electronics
-- Universitas Gadjah Mada, Yogyakarta, Indonesia
+- Anders Emmanuel Tan - Image Processing Algorithm Code
+- Evan Razzan Adytaputra - Machine Learning Algorithm Code
+- Indratanaya Budiman - Frontend Flask Code
+- Daffa Maulana Siddiq - Report and Documentation
 
 ## 📚 References
 
