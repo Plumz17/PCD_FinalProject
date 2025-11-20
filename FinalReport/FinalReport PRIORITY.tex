@@ -1,0 +1,42 @@
+% Final Report Final
+
+\documentclass[conference]{IEEEtran}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{float}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage[english]{babel}
+
+\title{Automated Tuberculosis Detection from Chest X-Ray Images Using Traditional Digital Image Processing Techniques}
+
+\author{
+    \IEEEauthorblockN{Group 5}
+    \IEEEauthorblockA{
+        Department of Computer Science and Electronics \\
+        Universitas Gadjah Mada \\
+        Yogyakarta, Indonesia \\
+        email@ugm.ac.id
+    }
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Tuberculosis (TBC)  has become and remains a significant global challenge for thousands of years, causing deaths worldwide, particularly in countries not yet developed. This disease spreads through air, meaning that it is an \textit{airborne disease}. It spreads through active TBC carrier by coughs or sneeze that releases water droplets containing the bacteria.  It's infectious nature and the fatal potential that it brought if not treated immediately means that fast and accurate early detection becomes the key to decrease mortality rate related to TBC \cite{who2019, sharma2013}. Chest X-ray (CXR) imaging is a widely used method to screen for pulmonary TBC, but it requires manual inference from experts (i.e. doctors) to observe and determine TBC Positivity. And as proven by research, this faces challenges of subjectiveness, variable observer, and time consumption \cite{brady2017, degnan2019}. In addition, TBC radiological patterns often include other lung diseases, and with it potential misclassification \cite{vancleeff2005}. This paper presents an automated TBC detection system utilising traditional digital image processing (DIP) techniques following the AESFERM (Acquisition, Enhancement, Segmentation, Feature Extraction, Representation, Matching) framework. Our approach to this uses Gaussian smoothing, histogram equalisation, and Laplacian sharpening for image enhancement, Otsu thresholding and morphological operations for segmenting the lung, and feature extraction utilising Local Binary Patterns (LBP), Gray-Level-Co-occurence Matrix (GLCM), and HIstogram of Oriented Gradients (HOG). The system returned promising results in distinguishing between normal and chest X-rays affected by TBC, giving an alternative that is less computationally expensive compared to deep learning methods, which gives an advantage for edge devices and resource constrain.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Tuberculosis Detection, Digital Image Processing, Chest X-Ray Analysis, Computer-Aided Diagnosis, Medical Image Processing
+\end{IEEEkeywords}
+
+% --------------------------
+% BORDER OF EDITING PROGRESS
+% --------------------------
+
