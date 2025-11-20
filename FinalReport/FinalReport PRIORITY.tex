@@ -36,7 +36,31 @@ Tuberculosis (TBC)  has become and remains a significant global challenge for th
 Tuberculosis Detection, Digital Image Processing, Chest X-Ray Analysis, Computer-Aided Diagnosis, Medical Image Processing
 \end{IEEEkeywords}
 
+\section{Introduction}
+\label{sec:introduction}
+
+Tuberculosis (TBC) is a serious infectious disease caused by \textit{Mycobacterium tuberculosis}. It has become one of the most significant global health problems for thousands of years \cite{who2019, sharma2013}. TBC remains a leading cause of deaths worldwide, with fast and accurate early detection and treatment crucial for controlling and reduce disease spread and reducing mortality rates \cite{who2019}.
+
+One of the most used method in detection or screening pulmonary TBC is Chest X-ray (CXR)\cite{silverman1949, vanthoog2012}. CXR check allows lung conditions visualisation, helping in identifying earlier signs of TBC infection. In clinical practice, the interpretation of CXR image is usually done by medical personnel or experienced radiologist, which brings its own sets of limitations. These include, but not limited to subjective interpretations, a lot of time, and possibilities for errors or inter-observer opinion variability \cite{brady2017, degnan2019}.
+
+There is more to this challenge. Unfortunately, CXR images of TBC patients often show radiological patterns similar to other lung diseases such as pneumonia or lung cancer. And relying on manual interpretation may frequently lead to misclassification for the reasons earlier. \cite{vancleeff2005}. This situation can have serious consequences as misdiagnosis not only leads to inappropriate therapy but may also worsen health conditions and increase disease transmission risk (do remember that TBC is an airborne disease). The problem is further amplified by the shortage of radiologists, particularly in low-resource developing countries that are most affected by the high prevalence of TBC.
+
+However, with technological advanement, there is hope. In recent years, Computer-Aided Diagnosis (CAD) systems have emerged as promising solutions for assisting medical personnel and radiologist to aid TBC detection based on CXR images. Research by \cite{liu2021} demonstrates that AI-based systems can achieve TBC detection accuracy of 85\%, significantly higher than radiologists without AI assistance (62\%). This brings good news, as the research points out a possibly better ways to detect TBC while simultaneously reducing costs for training new radiologists and subject to less errors. Additionally, several studies have explored various image processing techniques for TBC detection, including hybrid feature approaches \cite{ahmed2023} and chest X-ray enhancement methods \cite{tarambale2021}.
+
+Proving to be substantially better and safer than manual interpretaion, deep learning approaches have shown impressive results. And with it, substantial computational resources and large annotated datasets. And it takes a lot of time, money, and work to improve deep learning models and set everything up for the hospital.
+
+What sets this paper apart is that it explores an alternative approach using traditional digital image processing techniques that offer interpretability, computational efficiency, and effectiveness even with limited data. Our work builds upon existing research in feature representation learning \cite{ghimire2020} and feature detection methods \cite{deepanshu2019}, but focuses specifically on a comprehensive pipeline using well-established image processing algorithms. And of course, the method does not need as much computational power required by deep learning models.
+
+The main contributions of this work include:
+\begin{itemize}
+\item A complete TBC detection pipeline using traditional digital image processing techniques
+\item Implementation of the AESFERM framework specifically tailored for TBC detection in chest X-rays
+\item Comprehensive feature extraction combining texture, statistical, and shape information
+\item Evaluation of the approach on a publicly available TBC chest X-ray dataset
+\end{itemize}
+
 % --------------------------
 % BORDER OF EDITING PROGRESS
 % --------------------------
+
 
