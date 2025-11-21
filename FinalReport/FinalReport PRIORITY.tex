@@ -64,6 +64,16 @@ The main contributions of this work include:
 
 The primary constraint that applies in the making of this paper is to stick to traditional digital image processing methods and should not utilise machine learning. The limitation forces the usage of traditional machine learning, and the TBC detection system follows the comprehensive AESFERM framework (Acquisition, Enhancement, Segmentation, Feature Extraction, Representation, Matching). This structured approach ensures systematic processing of chest X-ray images from initial acquisition through final classification. And hopefully, resulting in accurate result that can be used to help medical personnel to better identify early stages of TBC and give treatment fast.
 
+\subsection{Image Acquisition}
+\label{subsec:acquisition}
+
+Image Acquisition. The stage that starts them all. This stage is the initialisation and involves acquiring and standardising chest X-ray images for consistent processing. For this, we utilise the publicly available Tuberculosis Chest X-ray Database from Kaggle \cite{kaggle2018}. The Kaggle dataset containing 4,200 chest X-ray images (3,500 normal cases, 700 TBC cases) in PNG format with 512×512 pixel resolution which will come in handy, especially consistency.
+
+Why do we use this approach? This Kaggle dataset provides a substantial number of clinically validated cases with balanced distribution between normal and TBC classes. The fixed 512×512 resolution ensures consistency in the processing and eliminates variations that occurs due to different image dimensions. In addition to that, we also use grayscale conversion which simplifies processing while preserving the essential morphological information needed for TBC detection, as color information is redundant in X-ray analysis, due to its grayscale nature.
+
+Before processing the images, each of them undergoes grayscale conversion to simplify processing while preserving essential morphological information. This process of standardisation ensures that all input images have consistent dimensions and color space, thus forming a reliable foundation for the next processing stages.
+
 % --------------------------
 % BORDER OF EDITING PROGRESS
 % --------------------------
+
