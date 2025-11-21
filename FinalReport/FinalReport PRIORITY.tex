@@ -73,7 +73,36 @@ Why do we use this approach? This Kaggle dataset provides a substantial number o
 
 Before processing the images, each of them undergoes grayscale conversion to simplify processing while preserving essential morphological information. This process of standardisation ensures that all input images have consistent dimensions and color space, thus forming a reliable foundation for the next processing stages.
 
+\subsection{Image Enhancement}
+\label{subsec:enhancement}
+
+Having acquired the image, the next step is to perform image enhancement. The Image enhancement stage aims to improve visual quality and highlight features that are relevant to TBC detection. Our enhancement pipeline uses three sequential operations:
+
+\subsubsection{Gaussian Smoothing}
+We apply Gaussian smoothing with a 5×5 kernel to reduce random noise inherent in X-ray acquisition:
+\begin{equation}
+G(x,y) = \frac{1}{2\pi\sigma^2} e^{-\frac{x^2 + y^2}{2\sigma^2}}
+\end{equation}
+where $\sigma = 0$ for uniform smoothing. This operation makes sure that important lung structures are preserved all while minimizing acquisition artifacts that are present in the picture.
+
+We choose this method, as gaussian smoothing effectively reduces high-frequency noise without significantly blurring important edges and structures. This is really great because X-ray images often contain quantum noise from the acquisition process (the X-ray shot) that can interfere with accurate segmentation and feature extraction. The 5×5 kernel size provides optimal balance between noise reduction and detail preservation for 512×512 images.
+
+\subsubsection{Laplacian Sharpening}
+Lung CXR often includes parts that are not used for the machine learning model. We want to focus on the lung part, since it is where the TBC virus lives. Edge detection is used to identify the edges (perimeter) of the lung and feed it for the next stage. Edge enhancement is achieved through Laplacian sharpening:
+\begin{equation}
+\nabla^2 f = \frac{\partial^2 f}{\partial x^2} + \frac{\partial^2 f}{\partial y^2}
+\end{equation}
+The sharpening operation emphasizes boundaries and fine details characteristic of TBC manifestations, such as cavity walls and lesion contours. This will aid in the segmentation process later on.
+
+Laplacian sharpening specifically enhances edges and fine details that are critical for identifying TBC-infected lung signs like cavitations, infiltrates, and pleural effusions. These features often have subtle intensity transitions that need enhancement for reliable detection. The method works by amplifying high-frequency components where these important diagnostic features reside.
+
+\subsubsection{Histogram Equalization}
+In addition to the two methods above, we also utilise histogram equalisation, which alters contrast. Global contrast improvement is performed by redistributing intensity values to span the full dynamic range (equalisation). This is enhancement particularly beneficial to visualise the subtle TBC signs like small infiltrates and early cavitation.
+
+You see, Chest X-rays often suffer from poor contrast due to variations in exposure parameters and patient anatomy. Histogram equalization maximizes the contrast throughout the image, making subtle TBC findings more apparent. This is particularly important for early-stage TBC where pathological changes may be minimal and poorly contrasted against normal lung tissue.
+
 % --------------------------
 % BORDER OF EDITING PROGRESS
 % --------------------------
+
 
