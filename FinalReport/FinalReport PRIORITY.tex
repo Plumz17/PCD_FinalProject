@@ -128,8 +128,44 @@ where only components near the central chest region are considered, and the two 
 
 The spatial constraint (centroid between 20\% and 80\% of image width) ensures that only anatomically plausible lung regions are selected, effectively eliminating artifacts in the region of interest. Selecting the two largest components corresponds to the left and right lungs, which in CXR images are typically the largest dark regions in a chest X-ray. This approach is more robust to variations in patient positioning and image quality.
 
+\subsection{Feature Extraction and Representation}
+\label{subsec:feature_extraction}
+
+After getting through acquisition, enhancement, and segmentation, the image will be extracted to obtain comprehensive features from the segmented lung regions using three more methods that were inspired by successfull medical image analysis implementations:
+
+\subsubsection{Local Binary Patterns (LBP)}
+LBP is a method that captures local texture patterns using uniform patterns with $P=8$ and $R=1$:
+\begin{equation}
+LBP_{P,R} = \sum_{p=0}^{P-1} s(g_p - g_c) \cdot 2^p
+\end{equation}
+The resulting 59-bins histogram from the process provides rotation-invariant texture descriptors.
+
+The reason why we use LBP is that it effectively captures micro-textural patterns that are characteristic of TBC manifestations such as granulomas, cavitations, and fibrotic changes. The uniform pattern variant (P=8, R=1) provides a good compromise between discriminative power and feature dimensionality. And the greath thing about LBP is that it is rotation invariance. And that is particularly valuable since TBC patterns can appear at various orientations.
+
+\subsubsection{Gray-Level Co-occurrence Matrix (GLCM)}
+GLCM extracts statistical texture features across multiple scales and orientations:
+\begin{itemize}
+\item \textbf{Distances}: [1, 2, 3] pixels for multi-scale analysis
+\item \textbf{Angles}: [0, $\pi/4$, $\pi/2$, $3\pi/4$] for orientation invariance
+\item \textbf{Features}: Contrast, correlation, energy, homogeneity, ASM, variance, dissimilarity, entropy
+\end{itemize}
+
+GLCM provides statistical measures of texture that complement LBP's local patterns. The multiple distances capture texture information at different scales. And that is very important because TBC manifestations vary in size from small nodules to large consolidations. The four angles ensure rotation invariance, while the eight Haralick features provide comprehensive characterization of tissue properties affected by TBC, such as heterogeneity (entropy), uniformity (energy), and local variations (contrast).
+
+\subsubsection{Histogram of Oriented Gradients (HOG)}
+Another feature extraction method that we use is HOG. The HOG method captures shape and edge information with the following parameters:
+\begin{itemize}
+\item \textbf{Orientations}: 9 bins
+\item \textbf{Pixels per cell}: 8×8
+\item \textbf{Cells per block}: 2×2 with L2-Hys normalization
+\end{itemize}
+
+HOG effectively captures the structural information and edge patterns that are crucial for identifying TBC-related anatomical changes, further increasing accuracy after LBP and GLCM. The 8×8 pixel cells provide sufficient spatial resolution to detect local shape variations, all while the 2×2 cell blocks with L2-Hys normalization provide illumination invariance. The 9 orientation bins offer good angular resolution for capturing directional features of TBC manifestations such as linear fibrotic streaks or irregular cavity boundaries.
+
+The final feature vector is amazing. It combines all extracted features into a comprehensive 142,990-dimensional representation suitable for machine learning classification. And it will be very valuable for enhancing its effectiveness and the model accuracy.
+
+Each feature type captures different aspects of TBC pathology—LBP for micro-texture, GLCM for statistical texture, and HOG for shape and edges. Their combination provides a more complete representation of the diverse radiological presentations of tuberculosis. And thus can be used for training a machine learning model that knows how to identify TBC-affected lung accurately, and quickly.
+
 % --------------------------
 % BORDER OF EDITING PROGRESS
 % --------------------------
-
-
