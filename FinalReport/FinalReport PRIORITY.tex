@@ -104,7 +104,32 @@ You see, Chest X-rays often suffer from poor contrast due to variations in expos
 \subsection{Image Segmentation}
 \label{subsec:segmentation}
 
+After acquiring the image and enhance it, we need to segment the lung away from the rest of the pictures, because we only need the lung part to analyse TBC positiveness. For that reason, accurate lung segmentation is crucial for precisely isolating the region of interest. Our segmentation approach combines multiple techniques:
+
+\subsubsection{Otsu Thresholding}
+This is an advanced thresholding method. Otsu's method is great for automatic optimal threshold calculation, and effective at separating lung tissue from background by minimizing intra-class intensity variance. The resulting binary mask is inverted to position lungs as the foreground, thus the region of interest.
+This method is amazing. Otsu's method automatically determines the optimal threshold without manual intervention, making it suitable for automated systems. It works particularly well with chest X-rays because there is typically good separation between the dark lung fields and brighter surrounding tissues. The bimodal intensity distribution problem commonly found in chest radiographs is handled effectively.
+
+\subsubsection{Morphological Processing}
+Morphological operations like dilation and erosion functions to better process the image. The dilation effectively "fills the hole" that are present in the image, while erosion "erodes" the image. Combining it in different order would create opening and closing methods, which are effective to remove noise. Morphological operations refine the initial segmentation:
+\begin{itemize}
+\item \textbf{Opening} (13×13 elliptical kernel): Removes small noise artifacts and separates connected components
+\item \texbf{Closing} (19×19 elliptical kernel): Fills holes in lung parenchyma and smooths boundaries
+\end{itemize}
+
+The elliptical kernel shape approximates the natural curvature of lung boundaries better than rectangular kernels, as lung have a shape that somewhat resembles elips. Rectangular kernels are not the best to use here, as using it will cause a lot of excess area that are not of interest. We use opening to remove small noise particles and separate lungs from other thoracic structures, while closing fills small gaps within the lung fields that may result from blood vessels or pathology. The specific kernel sizes (13×13 and 19×19) were the optimal performance values for 512×512 pixels chest X-rays images.
+
+\subsubsection{Connected Component Analysis}
+We identify lung regions through connected component analysis with spatial constraints:
+\begin{equation}
+\text{Lung candidates} = \{C_i | w \times 0.2 < x_{centroid} < w \times 0.8\}
+\end{equation}
+where only components near the central chest region are considered, and the two largest valid components are selected as left and right lungs.
+
+The spatial constraint (centroid between 20\% and 80\% of image width) ensures that only anatomically plausible lung regions are selected, effectively eliminating artifacts in the region of interest. Selecting the two largest components corresponds to the left and right lungs, which in CXR images are typically the largest dark regions in a chest X-ray. This approach is more robust to variations in patient positioning and image quality.
+
 % --------------------------
 % BORDER OF EDITING PROGRESS
 % --------------------------
+
 
