@@ -219,7 +219,53 @@ def process_and_get_vector(img):
     return vector, steps
 
 
+def lbp_to_image(lbp_array):
+    """Convert LBP array to visualizable image"""
+    try:
+        lbp_normalized = (lbp_array - lbp_array.min()) / (lbp_array.max() - lbp_array.min() + 1e-12)
+        lbp_img = (lbp_normalized * 255).astype(np.uint8)
+        return lbp_img
+    except Exception as e:
+        logger.error(f"Error in lbp_to_image: {e}")
+        return None
 
+
+def glcm_to_image(glcm_matrix):
+    """Convert GLCM matrix to visualizable image"""
+    try:
+        glcm_norm = (glcm_matrix - glcm_matrix.min()) / (glcm_matrix.max() - glcm_matrix.min() + 1e-12)
+        glcm_img = (glcm_norm * 255).astype(np.uint8)
+        return glcm_img
+    except Exception as e:
+        logger.error(f"Error in glcm_to_image: {e}")
+        return None
+
+
+def hog_to_image(image):
+    """Generate HOG visualization image"""
+    try:
+        image = ensure_uint8(image)
+        if image is None:
+            return None, np.array([])
+        
+        hog_features, hog_image = sk_hog(
+            image,
+            orientations=9,
+            pixels_per_cell=(8, 8),
+            cells_per_block=(2, 2),
+            block_norm='L2-Hys',
+            transform_sqrt=True,
+            visualize=True,
+            feature_vector=True
+        )
+        
+        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+        hog_img_uint8 = (hog_image_rescaled * 255).astype(np.uint8)
+        return hog_img_uint8, hog_features
+    except Exception as e:
+        logger.error(f"Error in hog_to_image: {e}")
+        return None, np.array([])
+    
 # -----------------------------------
 # FLASK ROUTES
 # -----------------------------------
@@ -246,4 +292,3 @@ def predict():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
