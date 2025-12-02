@@ -28,6 +28,9 @@
 
 \maketitle
 
+% Progress Border   --------------------------------------------------
+% DaffMaulns        --------------------------------------------------
+
 \begin{abstract}
 Tuberculosis (TBC)  has become and remains a significant global challenge for thousands of years, causing deaths worldwide, particularly in countries not yet developed. This disease spreads through air, meaning that it is an airborne disease. It spreads through active TBC carrier by coughs or sneeze that releases water droplets containing the bacteria.  It's infectious nature and the fatal potential that it brought if not treated immediately means that fast and accurate early detection becomes the key to decrease mortality rate related to TBC \cite{who2019, sharma2013}. Chest X-ray (CXR) imaging is a widely used method to screen for pulmonary TBC, but it requires manual inference from experts (i.e. doctors) to observe and determine TBC Positivity. And as proven by research, this faces challenges of subjectiveness, variable observer, and time consumption \cite{brady2017, degnan2019}. In addition, TBC radiological patterns often include other lung diseases, and with it potential misclassification \cite{vancleeff2005}. This paper presents an automated TBC detection system utilising traditional digital image processing (DIP) techniques following the AESFERM (Acquisition, Enhancement, Segmentation, Feature Extraction, Representation, Matching) framework. Our approach to this uses Gaussian smoothing, histogram equalisation, and Laplacian sharpening for image enhancement, Otsu thresholding and morphological operations for segmenting the lung, and feature extraction utilising Local Binary Patterns (LBP), Gray-Level-Co-occurence Matrix (GLCM), and Histogram of Oriented Gradients (HOG). The system returned promising results in distinguishing between normal and chest X-rays affected by TBC, giving an alternative that is less computationally expensive compared to deep learning methods, which gives an advantage for edge devices and resource constraint.
 \end{abstract}
@@ -114,7 +117,7 @@ This method is amazing. Otsu's method automatically determines the optimal thres
 Morphological operations like dilation and erosion functions to better process the image. The dilation effectively "fills the hole" that are present in the image, while erosion "erodes" the image. Combining it in different order would create opening and closing methods, which are effective to remove noise. Morphological operations refine the initial segmentation:
 \begin{itemize}
 \item \textbf{Opening} (13×13 elliptical kernel): Removes small noise artifacts and separates connected components
-\item \texbf{Closing} (19×19 elliptical kernel): Fills holes in lung parenchyma and smooths boundaries
+\item \textbf{Closing} (19×19 elliptical kernel): Fills holes in lung parenchyma and smooths boundaries
 \end{itemize}
 
 The elliptical kernel shape approximates the natural curvature of lung boundaries better than rectangular kernels, as lung have a shape that somewhat resembles elips. Rectangular kernels are not the best to use here, as using it will cause a lot of excess area that are not of interest. We use opening to remove small noise particles and separate lungs from other thoracic structures, while closing fills small gaps within the lung fields that may result from blood vessels or pathology. The specific kernel sizes (13×13 and 19×19) were the optimal performance values for 512×512 pixels chest X-rays images.
@@ -166,6 +169,92 @@ The final feature vector is amazing. It combines all extracted features into a c
 
 Each feature type captures different aspects of TBC pathology—LBP for micro-texture, GLCM for statistical texture, and HOG for shape and edges. Their combination provides a more complete representation of the diverse radiological presentations of tuberculosis. And thus can be used for training a machine learning model that knows how to identify TBC-affected lung accurately, and quickly.
 
-% --------------------------
-% BORDER OF EDITING PROGRESS
-% --------------------------
+% DaffMaulns        --------------------------------------------------
+% Progress Border   --------------------------------------------------
+
+
+
+% BORDERSKIP
+
+
+
+% Progress Border   --------------------------------------------------
+% Name              --------------------------------------------------
+
+% Content
+
+% Name              --------------------------------------------------
+% Progress Border   --------------------------------------------------
+
+\subsubsection{Machine Learning}
+
+\section{Experimental Setup and Preliminary Results}
+\label{sec:experimental}
+
+\subsection{Dataset and Evaluation Metrics}
+\label{subsec:dataset}
+
+% To be filled with experimental details
+
+\subsection{Implementation Details}
+\label{subsec:implementation}
+
+% To be filled with implementation details
+
+\subsection{Preliminary Results}
+\label{subsec:preliminary}
+
+% To be filled with results
+
+\subsection{Performance Analysis}
+\label{subsec:performance_analysis}
+
+% To be filled with analysis
+
+\begin{thebibliography}{00}
+
+\bibitem{who2019}
+World Health Organization, ``Global Tuberculosis Report 2019,'' WHO, Geneva, Switzerland, 2019.
+
+\bibitem{sharma2013}
+S. K. Sharma and A. Mohan, ``Tuberculosis: From an incurable scourge to a curable disease—journey over a millennium,'' Indian J. Med. Res., vol. 137, no. 3, p. 455, 2013.
+
+\bibitem{silverman1949}
+C. Silverman, ``An appraisal of the contribution of mass radiography in the discovery of pulmonary tuberculosis,'' Amer. Rev. Tuberculosis, vol. 60, no. 4, pp. 466–482, 1949.
+
+\bibitem{vanthoog2012}
+A. H. van't Hoog, H. K. Meme, K. F. Laserson, J. A. Agaya, B. G. Muchiri, W. A. Githui, L. O. Odeny, B. J. Marston, and M. W. Borgdorff, ``Screening strategies for tuberculosis prevalence surveys: The value of chest radiography and symptoms,'' PLoS ONE, vol. 7, no. 7, Jul. 2012, Art. no. e38691.
+
+\bibitem{brady2017}
+A. P. Brady, ``Error and discrepancy in radiology: Inevitable or avoidable?'' Insights Imag., vol. 8, no. 1, pp. 171–182, Feb. 2017.
+
+\bibitem{degnan2019}
+A. J. Degnan, E. H. Ghobadi, P. Hardy, E. Krupinski, E. P. Scali, L. Stratchko, A. Ulano, E. Walker, A. P. Wasnik, and W. F. Auffermann, ``Perceptual and interpretive error in diagnostic radiology—Causes and potential solutions,'' Academic Radiol., vol. 26, no. 6, pp. 833–845, Jun. 2019.
+
+\bibitem{vancleeff2005}
+M. van Cleeff, L. Kivihya-Ndugga, H. Meme, J. Odhiambo, and P. Klatser, ``The role and performance of chest X-ray for the diagnosis of tuberculosis: A cost-effectiveness analysis in Nairobi, Kenya,'' BMC Infectious Diseases, vol. 5, no. 1, p. 111, Dec. 2005.
+
+\bibitem{liu2021}
+Y. Liu, J. Wu, X. Wu, J. Wang, Y. Lu, H. Zhang, and Y. Xu, ``Deep learning assistance for tuberculosis diagnosis with chest radiography in low-resource settings,'' European Respiratory Journal, vol. 58, no. 6, p. 2100633, 2021.
+
+\bibitem{kaggle2018}
+Qatar University, University of Dhaka, and University of Malaya, ``Tuberculosis (TBC) Chest X-ray Database,'' Kaggle, 2018. [Online]. Available: https://www.kaggle.com/datasets/tawsifurrahman/tuberculosis-TBC-chest-xray-dataset
+
+\bibitem{ahmed2023}
+I. A. Ahmed, E. M. Senan, H. S. A. Shatnawi, Z. M. Alkhraisha, and M. M. A. Al-Azzam, ``Multi-Techniques for Analyzing X-ray Images for Early Detection and Differentiation of Pneumonia and Tuberculosis Based on Hybrid Features,'' Diagnostics, vol. 13, no. 4, art. 814, 2023.
+
+\bibitem{tarambale2021}
+M. R. Tarambale and N. S. Lingayat, ``Chest X-ray Enhancement for the Proper Extraction of Suspicious Lung Nodule,'' Int. J. Innov. Eng. Res. Technol., vol. 3, no. 11, pp. 1-9, 2021.
+
+\bibitem{ghimire2020}
+S. Ghimire, S. Kashyap, J. T. Wu, A. Karargyris, and M. Moradi, ``Learning Invariant Feature Representation to Improve Generalization across Chest X-ray Datasets,'' arXiv, 2020.
+
+\bibitem{gozes2019}
+O. Gozes and H. Greenspan, ``Deep Feature Learning from a Hospital-Scale Chest X-ray Dataset with Application to TBC Detection on a Small-Scale Dataset,'' arXiv, 2019.
+
+\bibitem{deepanshu2019}
+Deepanshu T., ``Introduction to Feature Detection and Matching,'' Medium, 2019.
+
+\end{thebibliography}
+
+\end{document}
