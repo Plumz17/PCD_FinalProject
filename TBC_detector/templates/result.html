@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hasil Deteksi TBC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body class="bg-light">
+
+<div class="container py-5">
+    <div class="card shadow-lg p-4 text-center" style="max-width: 700px; margin: auto;">
+
+        <h2 class="mb-3">Hasil Deteksi</h2>
+
+        <img src="{{ image_path }}" class="img-fluid rounded mb-3 shadow" style="max-height: 350px;">
+
+        <div class="alert 
+             {% if result == 'TBC TERDETEKSI' %}
+                   alert-danger
+             {% else %}
+                   alert-success
+             {% endif %} 
+             fw-bold fs-4">
+            {{ result }}
+        </div>
+
+        <a href="/" class="btn btn-secondary mt-3">Kembali</a>
+    </div>
+</div>
+
+</body>
+</html>
+
+<link rel="stylesheet" href="/static/css/style.css">

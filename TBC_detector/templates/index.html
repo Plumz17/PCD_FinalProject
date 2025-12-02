@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>TBC Detector</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 60px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px 35px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            width: 420px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            margin: 20px 0;
+            font-size: 15px;
+        }
+
+        button {
+            background: #005eff;
+            border: none;
+            padding: 12px 22px;
+            color: white;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #003fcc;
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+
+        .normal {
+            background: #d5f5d5;
+            color: #116611;
+            border: 1px solid #88cc88;
+        }
+
+        .tbc {
+            background: #ffe0e0;
+            color: #aa0000;
+            border: 1px solid #ff9999;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>TBC Detector</h1>
+
+    <div class="card">
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <input type="file" name="image" required>
+            <br>
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if prediction is not none %}
+            {% if prediction == 0 %}
+                <div class="result normal">Hasil: NORMAL (Tidak ada indikasi TBC)</div>
+            {% else %}
+                <div class="result tbc">Hasil: TBC (Ada indikasi Tuberculosis)</div>
+            {% endif %}
+        {% endif %}
+{% if steps %}
+    <h2>Processing Steps</h2>
+    {% for name, filename in steps.items() %}
+        <div style="margin-bottom: 20px">
+            <h3>{{ name }}</h3>
+            <img src="{{ url_for('static', filename='steps/' ~ filename) }}" width="300">
+        </div>
+    {% endfor %}
+{% endif %}
+
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+body {
+    background: linear-gradient(to bottom right, #dff1ff, #ffffff);
+}
+
+.card {
+    border-radius: 20px;
+}
+
+.btn-primary {
+    font-size: 18px;
+    padding: 12px;
+    border-radius: 12px;
+}
