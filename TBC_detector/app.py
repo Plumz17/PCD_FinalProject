@@ -190,8 +190,34 @@ def process_image(img):
 
 def process_and_get_vector(img):
     processed, steps = process_image(img)
+
+    # --- LBP ---
+    lbp = feature.local_binary_pattern(processed, 8, 1, method="uniform")
+    lbp_img = lbp_to_image(lbp)
+    steps["07_lbp"] = save_step_image(lbp_img, "07_lbp")
+
+    # --- GLCM ---
+    glcm = feature.graycomatrix(
+        img_as_ubyte(processed),
+        distances=[1],
+        angles=[0],
+        levels=256,
+        symmetric=True,
+        normed=True
+    )
+    glcm_matrix = glcm[:, :, 0, 0]
+    glcm_img = glcm_to_image(glcm_matrix)
+    steps["08_glcm"] = save_step_image(glcm_img, "08_glcm")
+
+    # --- HOG ---
+    hog_img, hog_features = hog_to_image(processed)
+    steps["09_hog"] = save_step_image(hog_img, "09_hog")
+
+    # ---- Extract feature vector ----
     vector = extract_features(processed)
+
     return vector, steps
+
 
 
 # -----------------------------------
