@@ -2,103 +2,173 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>TBC Detector</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TBC Detection System</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: #f4f7f9;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 60px;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 20px;
         }
-
         h1 {
-            color: #333;
-            margin-bottom: 20px;
-            font-size: 32px;
+            text-align: center;
+            margin-bottom: 10px;
         }
-
-        .card {
+        .container {
+            max-width: 1000px;
+            margin: auto;
+        }
+        .upload-box, .result-box {
             background: #fff;
-            padding: 25px 35px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+            padding: 20px;
             border-radius: 12px;
-            width: 420px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+        }
+        .upload-box form {
             text-align: center;
         }
-
-        input[type="file"] {
-            margin: 20px 0;
-            font-size: 15px;
+        input[type=file] {
+            margin-top: 15px;
         }
-
         button {
-            background: #005eff;
+            margin-top: 15px;
+            padding: 10px 20px;
             border: none;
-            padding: 12px 22px;
-            color: white;
+            background: #007bff;
+            color: #fff;
             border-radius: 6px;
-            font-size: 16px;
             cursor: pointer;
-            transition: 0.2s;
+        }
+        button:hover { background: #0056b3; }
+
+        .prediction {
+            font-size: 22px;
+            text-align: center;
+            margin-top: 10px;
         }
 
-        button:hover {
-            background: #003fcc;
+        .uploaded-preview {
+            text-align: center;
+            margin-top: 20px;
         }
-
-        .result {
-            margin-top: 25px;
-            padding: 15px;
+        .uploaded-preview img {
+            width: 300px;
             border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-top: 25px;
+        }
+        .step-item {
+            padding: 10px;
+            background: #fafafa;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+        .step-item img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .error-box {
+            background: #ffd6d6;
+            color: #a10000;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .not-loaded {
+            text-align: center;
             font-size: 18px;
-        }
-
-        .normal {
-            background: #d5f5d5;
-            color: #116611;
-            border: 1px solid #88cc88;
-        }
-
-        .tbc {
-            background: #ffe0e0;
-            color: #aa0000;
-            border: 1px solid #ff9999;
+            color: #b00;
+            margin-bottom: 10px;
         }
     </style>
+
+    <script>
+        function cleanupSession(sessionId) {
+            fetch(`/cleanup/${sessionId}`, { method: "POST" })
+                .then(r => r.json())
+                .then(data => alert("Session cleaned: " + JSON.stringify(data)))
+                .catch(err => alert("Cleanup failed: " + err));
+        }
+    </script>
+
 </head>
 <body>
 
-    <h1>TBC Detector</h1>
+<div class="container">
 
-    <div class="card">
-        <form action="/predict" method="post" enctype="multipart/form-data">
-            <input type="file" name="image" required>
+    <h1>Sistem Deteksi Tuberkulosis</h1>
+
+    {% if not model_loaded %}
+        <div class="not-loaded">⚠ Model belum dimuat. Pastikan <code>model/model.pkl</code> tersedia.</div>
+    {% endif %}
+
+    {% if error %}
+        <div class="error-box">{{ error }}</div>
+    {% endif %}
+
+    <!-- Upload Box -->
+    <div class="upload-box">
+        <form action="/predict" method="POST" enctype="multipart/form-data">
+            <h3>Upload Gambar X-Ray</h3>
+            <input type="file" name="image" accept="image/*" required>
             <br>
-            <button type="submit">Predict</button>
+            <button type="submit">Proses</button>
         </form>
+    </div>
 
-        {% if prediction is not none %}
-            {% if prediction == 0 %}
-                <div class="result normal">Hasil: NORMAL (Tidak ada indikasi TBC)</div>
-            {% else %}
-                <div class="result tbc">Hasil: TBC (Ada indikasi Tuberculosis)</div>
-            {% endif %}
-        {% endif %}
-{% if steps %}
-    <h2>Processing Steps</h2>
-    {% for name, filename in steps.items() %}
-        <div style="margin-bottom: 20px">
-            <h3>{{ name }}</h3>
-            <img src="{{ url_for('static', filename='steps/' ~ filename) }}" width="300">
+    {% if upload_image %}
+    <div class="upload-box uploaded-preview">
+        <h3>Gambar yang Diupload:</h3>
+        <img src="{{ upload_image }}" alt="uploaded image">
+    </div>
+    {% endif %}
+
+    {% if prediction %}
+    <div class="result-box">
+
+        <div class="prediction">
+            Hasil Prediksi: <strong>{{ prediction }}</strong>
         </div>
-    {% endfor %}
-{% endif %}
 
+        {% if prediction_proba %}
+        <p style="text-align:center; margin-top:5px; font-size:16px;">
+            Tingkat Keyakinan: <strong>{{ prediction_proba.confidence }}%</strong>
+        </p>
+        {% endif %}
+
+        {% if session_id %}
+        <p style="text-align:center; margin-top:10px;">
+            <button onclick="cleanupSession('{{ session_id }}')">Bersihkan Session</button>
+        </p>
+        {% endif %}
+
+        <h3 style="text-align:center; margin-top:30px;">Tahapan Pengolahan Citra</h3>
+
+        <div class="steps-grid">
+            {% for name, path in steps.items() %}
+            <div class="step-item">
+                <strong>{{ name }}</strong><br>
+                <img src="{{ path }}" alt="{{ name }}">
+            </div>
+            {% endfor %}
+        </div>
 
     </div>
+    {% endif %}
+
+</div>
 
 </body>
 </html>
