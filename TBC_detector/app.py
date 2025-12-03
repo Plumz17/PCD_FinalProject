@@ -1,4 +1,3 @@
-# app.py - Advanced Flask app (single-file)
 import os
 import uuid
 import atexit
@@ -10,23 +9,26 @@ from flask import Flask, render_template, request, jsonify, send_from_directory
 import joblib
 import cv2
 import numpy as np
-from skimage import feature, img_as_ubyte, exposure
+from skimage import feature, img_as_ubyte
 import skimage
-from skimage.feature import hog as sk_hog
+
+
 
 # ---------------------------
 # CONFIG
 # ---------------------------
+
 class Config:
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl")
+    MODEL_PATH = os.path.join(BASE_DIR, "model", "model.pkl") 
     UPLOADS_DIR = os.path.join(BASE_DIR, "static", "uploads")
     STEPS_DIR = os.path.join(BASE_DIR, "static", "steps")
-    IMAGE_SIZE = (512, 512)  # (w, h)
+    IMAGE_SIZE = (512, 512)
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
-    MAX_CONTENT_LENGTH = 8 * 1024 * 1024  # 8 MB
-    SESSION_FILE_TTL = 60 * 60 * 1  # seconds to keep session files (1 hour)
-    CLEANUP_OLDER_THAN = 24 * 3600  # cleanup files older than 24 hours
+    MAX_CONTENT_LENGTH = 8 * 1024 * 1024  
+    SESSION_FILE_TTL = 60 * 60 * 1  
+    CLEANUP_OLDER_THAN = 24 * 3600  
+
 
 # ---------------------------
 # LOGGING
@@ -86,10 +88,7 @@ def ensure_uint8(img):
         norm = (img - imin) / (imax - imin)
         return (norm * 255).astype(np.uint8)
 
-def save_step_image(img, step_name, session_id=None):
-    """
-    Save an intermediate step image. Returns the relative filename (for template).
-    """
+def save_step_image(img, step_name, session_id=None):  # Save an intermediate step image
     try:
         if img is None:
             return None
@@ -102,11 +101,7 @@ def save_step_image(img, step_name, session_id=None):
         logger.exception(f"Failed saving step image {step_name}: {e}")
         return None
 
-def cleanup_session_files(session_id):
-    """
-    Remove files belonging to a session (uploads and steps).
-    Files are matched by session id substring in filename.
-    """
+def cleanup_session_files(session_id): #Remove files belonging to a session (uploads and steps). Files are matched by session id substring in filename.
     try:
         patterns = [
             os.path.join(Config.UPLOADS_DIR, f"*{session_id}*.png"),
@@ -128,10 +123,7 @@ def cleanup_session_files(session_id):
         logger.exception(f"Error in cleanup_session_files: {e}")
         return []
 
-def cleanup_all_temp_files(older_than_seconds=Config.CLEANUP_OLDER_THAN):
-    """
-    Cleanup all temporary files older than older_than_seconds
-    """
+def cleanup_all_temp_files(older_than_seconds=Config.CLEANUP_OLDER_THAN): #Cleanup all temporary files older than older_than_seconds
     try:
         cutoff = datetime.utcnow() - timedelta(seconds=older_than_seconds)
         removed = []
@@ -157,6 +149,7 @@ atexit.register(lambda: cleanup_all_temp_files())
 # IMAGE PIPELINE
 # ---------------------------
 def enhance_image(img):
+    ensure_uint8(img)
     img_gaussian = cv2.GaussianBlur(img, (5, 5), 0)
     img_laplacian = cv2.Laplacian(img_gaussian, cv2.CV_64F)
     img_sharpened = cv2.convertScaleAbs(img_gaussian - img_laplacian)
@@ -177,7 +170,8 @@ def select_lungs(segmented):
 
     candidates = []
     for i in range(1, num_labels):
-        x, y = centroids[i]
+        x = centroids[i][0] 
+        y = centroids[i] [1]
         area = stats[i, cv2.CC_STAT_AREA]
         # select components roughly within central horizontal band
         if w * 0.2 < x < w * 0.8:
@@ -189,98 +183,53 @@ def select_lungs(segmented):
     lung2 = np.zeros_like(segmented)
 
     if len(candidates) >= 1:
-        lung1[labels == candidates[0][1]] = 255
+        largest_component_id = candidates[0][1]
+        lung1[labels == largest_component_id] = 255
     if len(candidates) >= 2:
-        lung2[labels == candidates[1][1]] = 255
+        second_largest_component_id = candidates[1][1]
+        lung2[labels == second_largest_component_id] = 255
 
     return lung1, lung2
 
 def get_mask(img):
     lung1, lung2 = select_lungs(img)
     lungs = cv2.add(lung1, lung2)
-    kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (19, 19))
-    return cv2.morphologyEx(lungs, cv2.MORPH_CLOSE, kernel)
+    kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (19, 19))
+    return cv2.morphologyEx(lungs, cv2.MORPH_CLOSE, kernel_close)
 
 def apply_mask(img, mask):
-    if mask.shape != img.shape:
-        mask = cv2.resize(mask, (img.shape[1], img.shape[0]), interpolation=cv2.INTER_NEAREST)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     img_clahe = clahe.apply(img)
     return cv2.bitwise_and(img_clahe, img_clahe, mask=mask)
 
-def lbp_to_image(lbp_array):
-    try:
-        lbp_normalized = (lbp_array - lbp_array.min()) / (lbp_array.max() - lbp_array.min() + 1e-12)
-        lbp_img = (lbp_normalized * 255).astype(np.uint8)
-        return lbp_img
-    except Exception as e:
-        logger.exception(f"lbp_to_image error: {e}")
-        return None
-
-def glcm_to_image(glcm_matrix):
-    try:
-        glcm_norm = (glcm_matrix - glcm_matrix.min()) / (glcm_matrix.max() - glcm_matrix.min() + 1e-12)
-        glcm_img = (glcm_norm * 255).astype(np.uint8)
-        return glcm_img
-    except Exception as e:
-        logger.exception(f"glcm_to_image error: {e}")
-        return None
-
-def hog_to_image(image):
-    try:
-        image = ensure_uint8(image)
-        if image is None:
-            return None, np.array([])
-        hog_features, hog_image = sk_hog(
-            image,
-            orientations=9,
-            pixels_per_cell=(8, 8),
-            cells_per_block=(2, 2),
-            block_norm='L2-Hys',
-            transform_sqrt=True,
-            visualize=True,
-            feature_vector=True
-        )
-        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
-        hog_img_uint8 = (hog_image_rescaled * 255).astype(np.uint8)
-        return hog_img_uint8, hog_features
-    except Exception as e:
-        logger.exception(f"hog_to_image error: {e}")
-        return None, np.array([])
-
 # Feature extractors
 def extract_lbp(image, P=8, R=1):
     lbp = feature.local_binary_pattern(image, P, R, method="uniform")
-    n_bins = P + 2
-    hist, _ = np.histogram(lbp.ravel(), bins=n_bins, range=(0, n_bins))
+    n_bins = P+2
+    hist = np.bincount(lbp.astype(int).ravel(), minlength=n_bins)
     hist = hist.astype("float")
     if hist.sum() != 0:
         hist /= hist.sum()
     return hist
 
 def extract_glcm(image):
-    image = img_as_ubyte(image)
-    distances = [1, 2, 3]
-    angles = [0, np.pi/4, np.pi/2, 3*np.pi/4]
-    glcm = feature.graycomatrix(
-        image,
-        distances=distances,
-        angles=angles,
-        levels=256,
-        symmetric=True,
-        normed=True
-    )
-    props = ['ASM', 'contrast', 'dissimilarity', 'homogeneity', 'energy', 'correlation']
-    features = []
-    for prop in props:
-        features.extend(feature.graycoprops(glcm, prop).flatten())
-    # manual variance & entropy per (distance, angle)
-    for d in range(len(distances)):
-        for a in range(len(angles)):
-            glcm_slice = glcm[:, :, d, a]
-            features.append(np.var(glcm_slice))
-            features.append(-np.sum(glcm_slice * np.log2(glcm_slice + 1e-10)))
-    return np.array(features)
+  image = img_as_ubyte(image) 
+  distances = [1, 2, 3] 
+  angles = [0, np.pi/4, np.pi/2, 3*np.pi/4] 
+  glcm = feature.graycomatrix(image,
+                              distances=distances,
+                              angles=angles,
+                              levels=256,
+                              symmetric=True,
+                              normed=True) 
+  features = []
+  props = ['ASM', 'variance', 'contrast', 'dissimilarity', 'homogeneity', 'energy', 'correlation', 'entropy']
+
+  for prop in props: 
+    values = feature.graycoprops(glcm, prop).flatten()
+    features.extend(values)
+
+  return np.array(features)
 
 def extract_hog(image):
     hog = skimage.feature.hog(image, orientations=9,
@@ -335,34 +284,16 @@ def process_image(img, session_id=None):
 def process_and_get_vector(img, session_id=None):
     try:
         processed, steps = process_image(img, session_id)
-
-        lbp = feature.local_binary_pattern(processed, 8, 1, method="uniform")
-        lbp_img = lbp_to_image(lbp)
-        if lbp_img is not None:
-            steps["07_lbp"] = save_step_image(lbp_img, "07_lbp", session_id)
-
-        glcm = feature.graycomatrix(
-            img_as_ubyte(processed),
-            distances=[1],
-            angles=[0],
-            levels=256,
-            symmetric=True,
-            normed=True
-        )
-        glcm_matrix = glcm[:, :, 0, 0]
-        glcm_img = glcm_to_image(glcm_matrix)
-        if glcm_img is not None:
-            steps["08_glcm"] = save_step_image(glcm_img, "08_glcm", session_id)
-
-        hog_img, _ = hog_to_image(processed)
-        if hog_img is not None:
-            steps["09_hog"] = save_step_image(hog_img, "09_hog", session_id)
-
         vector = extract_features(processed)
         return vector, steps
     except Exception as e:
         logger.exception(f"Error in process_and_get_vector: {e}")
         raise
+if os.path.exists(Config.MODEL_PATH):
+    model = joblib.load(Config.MODEL_PATH)
+    model_loaded = True
+else:
+    logger.warning(f"Model not found at {Config.MODEL_PATH}. model_loaded = False")
 
 # ---------------------------
 # FLASK ROUTES
@@ -412,23 +343,10 @@ def predict():
         logger.info("Making prediction...")
         pred = model.predict([vector])[0]
 
-        pred_proba = None
-        if hasattr(model, "predict_proba"):
-            try:
-                proba = model.predict_proba([vector])[0]
-                pred_proba = {
-                    "class": pred,
-                    "confidence": float(max(proba) * 100)
-                }
-            except Exception as e:
-                logger.warning(f"Could not compute predict_proba: {e}")
-
-        logger.info(f"Prediction for session {session_id}: {pred}")
 
         response = render_template(
             "index.html",
             prediction=pred,
-            prediction_proba=pred_proba,
             steps=steps,
             upload_image=upload_url,
             model_loaded=model_loaded,
@@ -458,7 +376,6 @@ def health():
         "model_path": Config.MODEL_PATH
     })
 
-# Route to serve uploads/steps if needed (Flask static will already serve /static/*)
 @app.route("/static/uploads/<path:filename>")
 def serve_uploads(filename):
     return send_from_directory(Config.UPLOADS_DIR, filename)
