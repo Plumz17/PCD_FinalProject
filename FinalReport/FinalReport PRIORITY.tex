@@ -28,9 +28,6 @@
 
 \maketitle
 
-% Progress Border   --------------------------------------------------
-% DaffMaulns        --------------------------------------------------
-
 \begin{abstract}
 Tuberculosis (TBC)  has become and remains a significant global challenge for thousands of years, causing deaths worldwide, particularly in countries not yet developed. This disease spreads through air, meaning that it is an airborne disease. It spreads through active TBC carrier by coughs or sneeze that releases water droplets containing the bacteria.  It's infectious nature and the fatal potential that it brought if not treated immediately means that fast and accurate early detection becomes the key to decrease mortality rate related to TBC \cite{who2019, sharma2013}. Chest X-ray (CXR) imaging is a widely used method to screen for pulmonary TBC, but it requires manual inference from experts (i.e. doctors) to observe and determine TBC Positivity. And as proven by research, this faces challenges of subjectiveness, variable observer, and time consumption \cite{brady2017, degnan2019}. In addition, TBC radiological patterns often include other lung diseases, and with it potential misclassification \cite{vancleeff2005}. This paper presents an automated TBC detection system utilising traditional digital image processing (DIP) techniques following the AESFERM (Acquisition, Enhancement, Segmentation, Feature Extraction, Representation, Matching) framework. Our approach to this uses Gaussian smoothing, histogram equalisation, and Laplacian sharpening for image enhancement, Otsu thresholding and morphological operations for segmenting the lung, and feature extraction utilising Local Binary Patterns (LBP), Gray-Level-Co-occurence Matrix (GLCM), and Histogram of Oriented Gradients (HOG). The system returned promising results in distinguishing between normal and chest X-rays affected by TBC, giving an alternative that is less computationally expensive compared to deep learning methods, which gives an advantage for edge devices and resource constraint.
 \end{abstract}
@@ -70,9 +67,7 @@ The primary constraint that applies in the making of this paper is to stick to t
 \subsection{Image Acquisition}
 \label{subsec:acquisition}
 
-Image Acquisition. The stage that starts them all. This stage is the initialisation and involves acquiring and standardising chest X-ray images for consistent processing. For this, we utilise the publicly available Tuberculosis Chest X-ray Database from Kaggle \cite{kaggle2018}. The Kaggle dataset containing 4,200 chest X-ray images (3,500 normal cases, 700 TBC cases) in PNG format with 512×512 pixel resolution which will come in handy, especially consistency.
-
-Why do we use this approach? This Kaggle dataset provides a substantial number of clinically validated cases with balanced distribution between normal and TBC classes. The fixed 512×512 resolution ensures consistency in the processing and eliminates variations that occurs due to different image dimensions. In addition to that, we also use grayscale conversion which simplifies processing while preserving the essential morphological information needed for TBC detection, as color information is redundant in X-ray analysis, due to its grayscale nature.
+Image Acquisition. The stage that starts them all. This stage is the initialisation and involves acquiring and standardising chest X-ray images for consistent processing. For this, we utilise the publicly available Tuberculosis Chest X-ray Database from Kaggle \cite{kaggle2018}. In addition to that, we also use grayscale conversion which simplifies processing while preserving the essential morphological information needed for TBC detection, as color information is redundant in X-ray analysis, due to its grayscale nature.
 
 Before processing the images, each of them undergoes grayscale conversion to simplify processing while preserving essential morphological information. This process of standardisation ensures that all input images have consistent dimensions and color space, thus forming a reliable foundation for the next processing stages.
 
@@ -165,49 +160,90 @@ Another feature extraction method that we use is HOG. The HOG method captures sh
 
 HOG effectively captures the structural information and edge patterns that are crucial for identifying TBC-related anatomical changes, further increasing accuracy after LBP and GLCM. The 8×8 pixel cells provide sufficient spatial resolution to detect local shape variations, all while the 2×2 cell blocks with L2-Hys normalization provide illumination invariance. The 9 orientation bins offer good angular resolution for capturing directional features of TBC manifestations such as linear fibrotic streaks or irregular cavity boundaries.
 
-The final feature vector is amazing. It combines all extracted features into a comprehensive 142,990-dimensional representation suitable for machine learning classification. And it will be very valuable for enhancing its effectiveness and the model accuracy.
-
-Each feature type captures different aspects of TBC pathology—LBP for micro-texture, GLCM for statistical texture, and HOG for shape and edges. Their combination provides a more complete representation of the diverse radiological presentations of tuberculosis. And thus can be used for training a machine learning model that knows how to identify TBC-affected lung accurately, and quickly.
-
-% DaffMaulns        --------------------------------------------------
-% Progress Border   --------------------------------------------------
 
 
 
-% BORDERSKIP
+\subsection{Machine Learning}
+\label{subsec:machine-learning}
+
+after extracting the necessary features and labels, the first 80\% of the extracted features and labels were used for training while the rest of the data was used for testing the accuracy of the model. The model selected by the researcher is Logistic Regression which is a supervised machine learning algorithm that finds an optimal sigmoid function that will be used to determine the probability of a data point falling into a certain binary class, given the value of certain attributes. This algorithm best fits the case since the model would only need to predict whether the selected x-ray image for the input shows a healthy lung or a lung with TBC based on certain attributes such as the ASM, variance, and dissimilarity value of the received input. 
 
 
 
-% Progress Border   --------------------------------------------------
-% Name              --------------------------------------------------
-
-% Content
-
-% Name              --------------------------------------------------
-% Progress Border   --------------------------------------------------
-
-\subsubsection{Machine Learning}
 
 \section{Experimental Setup and Preliminary Results}
 \label{sec:experimental}
 
 \subsection{Dataset and Evaluation Metrics}
 \label{subsec:dataset}
+The Kaggle dataset used for the training section was the public Kaggle dataset containing 4,200 chest X-ray images (3,500 normal cases, 700 TBC cases) in PNG format with 512×512 pixel resolution provided by Tawsifur Rahman \cite{kaggle2018}. This Kaggle dataset provides a substantial number of clinically validated cases with balanced distribution between normal and TBC classes. The fixed 512×512 resolution ensures consistency in the processing and eliminates variations that occurs due to different image dimensions. For the testing set, we borrowed 100 healthy lung and 100 TBC lung images from the Kaggle page provided by Muhammad Rehan \cite{MuhammadRehan}. Below are the metrics we used to evaluate the performance of our model:
+\subsubsection{Accuracy}
+The accuracy tells us how many results the model predicted correctly from the 20\% test data provided, it is calculated by dividing the sum of the total true positives and true negatives with the total amount of data in the test split.
+\subsubsection{confusion matrix}
+The confusion matrix is a 2x2 table that shows how many predictions fall into the true positives, false positives, true negatives, and false negatives category. This gives valuable information about the behavior of the model, where it most often makes mistakes, and in which areas did the model not learn properly.
+\subsubsection{Precision}
+Precision gives information about: out of all the samples that the model predicted as positive, how many were actually positive. it is calculated using the formula:
+\begin{equation}
+\frac{True\ positives}{True\ positives + False\ positives}
+\end{equation}
 
+\subsubsection{F1-Score}
+The F1-score is a metric that provides a single measure of a model's performance by calculating the harmonic mean of its precision and recall. It offers a balanced view of the trade-off between false positives and false negatives. It is calculated using the formula:
+\begin{equation}
+2*
+\frac{precision * recall}{precision + recall}
+\end{equation}
+
+\subsubsection{Sensitivity and specifity}
+Sensitivity calculates out of all the positive cases how many did the model actually detect, a low recall means that the model will not be able to diagnose or identify TBC patients correctly. Sensitivity is calculated using the formula:
+\begin{equation}
+\frac{True\ Positives}{True\ Positives + False\ Negatives}
+\end{equation}
+Meanwhile specificity determines how well the model is able to identify healthy patients, low specificity means that the model would often misdiagnose healthy lungs as TBC patients. Specificity is calculated by:
+\begin{equation}
+\frac{True\ Negatives}{True\ Negatives + False\ Positives}
+\end{equation}
 % To be filled with experimental details
 
-\subsection{Implementation Details}
-\label{subsec:implementation}
-
 % To be filled with implementation details
+\subsubsection{ROC curve and AUC}
+The Receiver Operating Characteristic (ROC) curve measures how well the model is able to separate the 2 classes (TBC and normal), the x-axis of the ROC represents the ratio of false positives and the amount of TBC lungs in the dataset, the y-axis of the ROC represents the ratio of true positives and the amount of healthy lungs in the dataset. The area under curve (AUC) gives the probability that a randomly chosen positive example gets a higher score than a randomly chosen negative example, an AUC score of 0.5 means that the model has just been randomly guessing instead of making calculated decisions based on data, a high AUC score (\> 0.8) would mean that the model has been learning well.
 
 \subsection{Preliminary Results}
+
+The LBP algorithm will be used to capture textures such as the spots or lesions of the lungs by comparing each pixel to its neighbors and encoding micro-patterns, the GLCM algorithm measures how often pairs of pixel intensities occur at certain distances and angles, the HOG feature representation algorithm will be used to detect and extract edges and also gradient strength patterns to outline the structural shape and contour of the lungs. To find the combination that gives the most optimal output, the researcher has tuned various combinations of the feature representation algorithms.
+
+\label{table:fr-combinations}
+
+
+\begin{table}[h]
+\centering
+\footnotesize
+\begin{tabular}{l c c c}
+\hline
+Method & accuracy & false negative & true positive  \\
+\hline
+HOG + LBP & 93.33\% & 33 & 204\\
+GLCM + LBP & 95.59\% & 23 & 114\\
+GLCM + HOG & 95.23\% & 24 & 113\\
+HOG & 93.33\%  & 34 & 103\\
+LBP & 83.69\% & 137 & 0\\
+GLCM & 95.23\%  & 24 & 113\\
+GLCM + HOG + LBP & 96.9\% & 16 & 121\\
+\hline
+\end{tabular}
+\caption{Comparison of different combinations of feature representation}
+\label{table:fr-combinatios}
+\end{table}
+
+The results from table 1 show that combining multiple feature extraction methods significantly improves the model’s ability to distinguish between normal and tuberculosis chest X-ray images. Individually, HOG and GLCM achieve solid performance (93.33\% and 95.23\%), while LBP alone gives poor accuracy as the results show that it seems to be incapable of detecting normal lungs. Pairing GLCM with HOG and HOG with LBP does not seem to improve GLCM or HOG alone at all, meanwhile pairing GLCM with LBP slightly improves the performance of GLCM. However, when all methods are combined together, the weaknesses of each algorithm are covered and this results in the most optimal performance with an accuracy of 96.9\%, highest true positives (121) and lowest false negatives (16). 
 \label{subsec:preliminary}
 
 % To be filled with results
 
 \subsection{Performance Analysis}
 \label{subsec:performance_analysis}
+
 
 % To be filled with analysis
 
@@ -254,6 +290,9 @@ O. Gozes and H. Greenspan, ``Deep Feature Learning from a Hospital-Scale Chest X
 
 \bibitem{deepanshu2019}
 Deepanshu T., ``Introduction to Feature Detection and Matching,'' Medium, 2019.
+
+\bibitem{MuhammadRehan}
+Muhammad Rehan. "Chest X-Ray Dataset". Available: https://www.kaggle.com/datasets/muhammadrehan00/chest-xray-dataset
 
 \end{thebibliography}
 
