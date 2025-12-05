@@ -1,9 +1,3 @@
-Yeah, let’s lock in the “final form” version. I’ll reuse the same overall flow as before, but now with your **updated numbers**.
-
-I’ll keep it compact so you can scan + copy into slides easily.
-
----
-
 ## Slide 1 – Title
 
 **Title:**
@@ -248,7 +242,3 @@ And then your closer:
 > “Thank you.”
 
 (Or the “we did it, we’re proud of it” line you like.)
-
----
-
-If you want, next step I can write a **tight 5–6 minute script** that walks through exactly this slide order with updated numbers woven in.
