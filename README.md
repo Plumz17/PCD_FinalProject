@@ -259,8 +259,9 @@ PCD_FinalProject/
 ├── PCD_FinalProject.ipynb     # Main Jupyter notebook (pipeline + experiments)
 ├── normal.png                 # Sample normal chest X-ray
 ├── tbc.png                    # Sample TB chest X-ray
-├── Final_Report.pdf           # Final IEEE-style project report
-├── Proposal.pdf               # Original project proposal (Indonesian)
+├── FinalReport                # Final IEEE-style project report
+├── TBC_detector               # UI/UX Frontend TBC Detector Webpage
+├── test set                   # Test Set for further testing
 ├── README.md                  # This file
 └── ...                        # (Any additional scripts/assets)
 ```
@@ -320,8 +321,8 @@ num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(img_open
 
 ** Group 5 – Digital Image Processing Course**
 
-* **Anders Emmanuel Tan** – Image processing pipeline implementation
-* **Evan Razzan Adytaputra** – Machine learning & evaluation
+* **Anders Emmanuel Tan** – Image processing pipeline implementation & Report writing
+* **Evan Razzan Adytaputra** – Machine learning, evaluation, & Report writing
 * **Indratanaya Budiman** – Frontend / Flask integration
 * **Daffa M. Siddiq** – Report writing & documentation
 
