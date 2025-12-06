@@ -321,10 +321,10 @@ num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(img_open
 
 ** Group 5 – Digital Image Processing Course**
 
-* **Anders Emmanuel Tan** – Image processing pipeline implementation & Report writing
-* **Evan Razzan Adytaputra** – Machine learning, evaluation, & Report writing
-* **Indratanaya Budiman** – Frontend / Flask integration
-* **Daffa M. Siddiq** – Report writing & documentation
+* **Anders Emmanuel Tan (Plumz17)** – Image processing pipeline implementation & Report writing
+* **Evan Razzan Adytaputra (evanrazzanadytaputra2006-dotcom)** – Machine learning, evaluation, & Report writing
+* **Indratanaya Budiman (nayabudiman)** – Frontend / Flask integration
+* **Daffa M. Siddiq (daffmaulns)** – Report writing & documentation
 
 ---
 
